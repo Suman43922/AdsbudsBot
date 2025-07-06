@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛍️ My Store</title>
+  <!---Bootstrap--->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!---Material Icons--->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /*---VARIABLES---*/
+    :root{
+      --primary:#d62828;
+      --dark:#222;
+      --light:#0e1320;
+      --shadow:0 2px 6px rgba(0,0,0,.15);
+    }
+    /*---RESET---*/
+    *,*::before,*::after{box-sizing:border-box;margin:0;
+    padding:0}
+    a{text-decoration:none;
+    color:inherit}
+
+    body{font-family:"Helvetica Neue",Arial,sans-serif;
+    background:var(--light);
+    color:#fff;
+    line-height:1.5}
+    /*---TOP-BAR---*/
+    #topbar{
+      background:var(--dark);
+      height:56px;
+      display:flex;
+      align-items:center;
+      gap:18px;
+      padding:0 16px;
+      position:sticky;
+      top:0;z-index:90
+    }
+    #hamburger,#searchBtn{font-size:28px;
+    cursor:pointer;
+    color:#fff}
+    #logo{display:flex;
+    align-items:center;
+    gap:6px;
+    color:#fff;
+    font-size:20px;
+    font-weight:600;
+    margin:auto}
+    #logo img{height:24px}
+    #searchBtn{margin-left:auto}
+    /*---SEARCH DROPDOWN---*/
+    #searchBar{display:none;
+    width:100%;
+    background:#fff;
+    padding:10px 16px;
+    box-shadow:var(--shadow)}
+    #searchBar.show{display:block}
+    #searchBar form{display:flex;
+    gap:10px}
+    #searchBar input{flex:1;
+    padding:8px 12px;
+    border:1px solid #ddd;
+    border-radius:4px;
+    font-size:15px}
+    #searchBar button{padding:8px 18px;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    font-weight:600;
+    cursor:pointer}
+    /*---DRAWER MENU---*/
+    #drawer{position:fixed;
+    top:0;left:-260px;
+    width:240px;
+    height:100%;
+    background:#0e1320;
+    overflow-y:auto;
+    box-shadow:2px 0 6px rgba(0,0,0,.18);
+    transition:.3s;
+    z-index:10001}
+    
+    #drawer.open{left:0}
+    #drawer a{display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 18px;
+    border-bottom:1px solid #696968;
+    font-size:15px;
+    font-weight:500;
+    color:#fff}
+    
+    #drawer a:hover{background: black}
+    .submenu a{padding-left:46px;
+    font-size:14px}
+    .submenu{display:none}
+    .submenu.show{display:block}
+    .rotate{transform:rotate(90deg)}
+    #overlay{position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    z-index:10000}
+    #overlay.show{display:block}
+    /*---PRODUCT MARQUEE---*/
+    #ticker{display:flex;
+    align-items:center;
+    border-top:3px solid var(--primary);
+      background:#696969;
+      overflow:hidden;
+      height:40px;
+      font-size:14px;
+      box-shadow:var(--shadow)}
+    #ticker .label{background:var(--primary);
+    color:#fff;
+    padding:0 12px;
+    font-weight:600;
+    height:100%;
+    display:flex;
+    align-items:center}
+    .ticker-wrap{flex:1;
+    overflow:hidden}
+    #ticker ul{display:flex;
+    gap:46px;
+    list-style:none;
+    animation:scroll 25s linear infinite}
+    #ticker li{white-space:nowrap}
+    @keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+    /*---GRID LAYOUT---*/
+    .container-grid{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+    display:grid;
+    grid-template-columns:3fr 1fr;
+    gap:24px}
+    @media(max-width:900px){
+.container-grid{
+  grid-template-columns:1fr}}
+    /*---PRODUCT CARD---*/
+    .product-card{background:#fff;
+    border-radius:6px;
+    box-shadow:var(--shadow);
+    transition:.2s;
+    margin-bottom:22px}
+    .product-card:hover{transform:translateY(-4px);
+    box-shadow:0 6px 20px rgba(0,0,0,.1)}
+    .product-card img{height:180px;
+    object-fit:cover;
+    width:100%;
+    border-radius:6px 6px 0 0}
+    .product-card .card-body{padding:16px;
+    text-align:center}
+    .product-card h6{font-size:17px;
+    margin-bottom:6px}
+    .product-card .price{color:var(--primary);
+    font-weight:600;
+    margin-bottom:8px}
+    .product-card p{font-size:14px;
+    color:#555;
+    min-height:38px}
+    .product-card button{margin-top:8px}
+    /*---SIDEBAR WIDGET---*/
+    .widget{background:#6969;
+    border-radius:6px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    margin-bottom:24px}
+    .widget h4{font-size:18px;
+    margin-bottom:12px;
+    border-left:4px solid var(--primary);
+    padding-left:8px}
+    .widget ul{list-style:none;
+    padding-left:0}
+    .widget li{margin-bottom:8px}
+    .widget a{font-weight:500;
+    color:#333}
+    .widget a:hover{text-decoration:underline;
+    color:var(--primary)}
+    /*---FOOTER---*/
+    footer{background:var(--dark);
+    color:#fff;
+    text-align:center;
+    padding:18px;
+    font-size:14px;
+    margin-top:40px}
+    /*---MODAL---*/
+    .modal-title{font-size:20px}
+  </style>
+</head>
+<body>
+  <!-- TOP-BAR -->
+  <div id="topbar">
+    <span id="hamburger" class="material-icons">menu</span>
+    <!-- Logo centred -->
+    <span id="logo">
+      <img src="https://img.icons8.com/fluency/48/000000/shopping-bag.png" alt="logo">
+      My Store
+    </span>
+    <span id="searchBtn" class="material-icons">search</span>
+  </div>
+  <!-- SEARCH BAR -->
+  <div id="searchBar">
+    <form id="searchForm">
+      <input type="text" id="searchInput" placeholder="Search products..." required>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- DRAWER -->
+  <div id="drawer">
+    <a href="#home"><span class="material-icons">home</span>Home</a>
+
+    <a href="javascript:void(0)" id="prodToggle">
+      <span class="material-icons">storefront</span>Products
+      <span class="material-icons ms-auto" id="prodArrow">chevron_right</span>
+    </a>
+    <div class="submenu" id="prodSub">
+      <a href="#watch">Watch</a>
+      <a href="#tv">TV</a>
+      <a href="#mobile">Mobile</a>
+      <a href="#clothes">Clothes</a>
+    </div>
+
+    <a href="#cart"><span class="material-icons">shopping_cart</span>Cart</a>
+    <a href="#orders"><span class="material-icons">receipt_long</span>Orders</a>
+    <a href="#support"><span class="material-icons">support_agent</span>Support</a>
+  </div>
+  <div id="overlay"></div>
+
+  <!-- PRODUCT MARQUEE -->
+  <div id="ticker">
+    <span class="label">Products</span>
+    <div class="ticker-wrap">
+      <ul id="tickerList"></ul>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="container-grid">
+    <!-- PRODUCT LIST -->
+    <div id="product-list"></div>
+
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="widget">
+        <h4>Related Products</h4>
+        <ul id="relatedList"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <!-- DETAILS MODAL -->
+  <div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <img class="w-100 mb-3 rounded" id="detailImage">
+          <p id="detailDesc"></p>
+          <h6 class="text-primary fw-semibold">Rs <span id="detailPrice"></span></h6>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-primary" onclick="addToCart(currentDetail)">Add to Cart</button>
+          <button class="btn btn-primary">Buy Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ---------- DATA ---------- */
+    const listEl = document.getElementById('product-list');
+    const tickerList = document.getElementById('tickerList');
+    const relatedList = document.getElementById('relatedList');
+
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+
+    /* ---------- MARQUEE ---------- */
+    tickerList.innerHTML = products.slice(0,10).map(p=>`<li>${p.name}</li>`).join('');
+
+    /* ---------- RENDER PRODUCTS (no category pills) ---------- */
+    function renderProducts(search=''){
+      listEl.innerHTML='';
+      let filtered = products.filter(p=> p.name.toLowerCase().includes(search.toLowerCase()));
+
+      if(filtered.length===0){
+        listEl.innerHTML='<p class="text-center">No products found.</p>';
+        return;
+      }
+
+      filtered.forEach((p,i)=>{
+        const card=document.createElement('div');
+        card.className='product-card';
+        card.innerHTML=`
+          <img src="${p.image}" alt="${p.name}">
+          <div class="card-body">
+            <h6>${p.name}</h6>
+            <p>${truncate(p.description,30)}</p>
+            <div class="price">Rs ${p.price}</div>
+            <button class="btn btn-sm btn-outline-primary w-100" onclick="addToCart(${i})">Add to Cart</button>
+            <button class="btn btn-sm btn-primary w-100 mt-2" onclick="showDetails(${i})">Full Details</button>
+          </div>`;
+        listEl.appendChild(card);
+      });
+      updateRelated();          // refresh sidebar suggestions
+    }
+    renderProducts();
+
+    function truncate(t,l){return t.length>l?t.slice(0,l)+'…':t}
+
+    /* ---------- CART ---------- */
+    function addToCart(index){
+      const cart=JSON.parse(localStorage.getItem('cart'))||[];
+      cart.push(products[index]);
+      localStorage.setItem('cart',JSON.stringify(cart));
+      alert('✅ Added to cart!');
+    }
+
+    /* ---------- MODAL DETAILS & related products refresh ---------- */
+    let currentDetail=0;
+    const modal = new bootstrap.Modal('#detailModal');
+    function showDetails(index){
+      currentDetail=index;
+      const p=products[index];
+      document.querySelector('#detailModal .modal-title').textContent=p.name;
+      document.getElementById('detailImage').src=p.image;
+      document.getElementById('detailDesc').textContent=p.description;
+      document.getElementById('detailPrice').textContent=p.price;
+      modal.show();
+      updateRelated(index);
+    }
+
+    /* ---------- SEARCH ---------- */
+    document.getElementById('searchForm').addEventListener('submit',e=>{
+      e.preventDefault();
+      renderProducts(document.getElementById('searchInput').value.trim());
+    });
+
+    /* ---------- DRAWER & SEARCH TOGGLE ---------- */
+    const hb=document.getElementById('hamburger');
+    const dr=document.getElementById('drawer');
+    const ov=document.getElementById('overlay');
+    hb.onclick=()=>{dr.classList.add('open');ov.classList.add('show')};
+    ov.onclick=()=>{dr.classList.remove('open');ov.classList.remove('show')};
+
+    const searchBtn=document.getElementById('searchBtn');
+    const searchBar=document.getElementById('searchBar');
+    searchBtn.onclick=()=>{
+      searchBar.classList.toggle('show');
+      if(searchBar.classList.contains('show'))document.getElementById('searchInput').focus();
+    };
+
+    /* ---------- Products submenu toggle ---------- */
+    const prodToggle=document.getElementById('prodToggle');
+    const prodSub=document.getElementById('prodSub');
+    const prodArrow=document.getElementById('prodArrow');
+    prodToggle.onclick=()=>{
+      prodSub.classList.toggle('show');
+      prodArrow.classList.toggle('rotate');
+    };
+
+    /* ---------- RELATED PRODUCTS ---------- */
+    function updateRelated(exclude=-1){
+      relatedList.innerHTML='';
+      let pool=[...products];
+      if(exclude>-1)pool.splice(exclude,1);           // नदेखाइएका प्रोडक्ट हटाउने
+      pool.sort(()=>0.5-Math.random());
+      pool.slice(0,5).forEach(p=>{
+        const li=document.createElement('li');
+        li.innerHTML=`<a href="javascript:void(0)" onclick="showDetails(${products.indexOf(p)})">${p.name}</a>`;
+        relatedList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+<footer>© 2025 My Store • All Rights Reserved</footer>
+</html>
