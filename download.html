@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All‑in‑One Video Downloader</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* --------‑ RESET & BASE -------- */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,Helvetica,Arial,sans-serif;background:#f1f5f9;color:#0f172a;padding:2rem}
+    .container{max-width:650px;margin:0 auto;text-align:center}h1{font-size:1.9rem;font-weight:700;margin-bottom:1.25rem}
+p.tagline{font-size:0.95rem;color:#475569;margin-bottom:2rem}
+
+input[type="text"]{width:100%;padding:0.85rem 1rem;font-size:1rem;border:1px solid #cbd5e1;border-radius:0.55rem;margin-bottom:1rem;outline:none;font-family:inherit}
+input[type="text"]:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+
+/* Centered blue button */
+button#downloadBtn{display:block;margin:0 auto;padding:0.85rem 2rem;background:#2563eb;color:#fff;font-size:1rem;border:none;border-radius:9999px;cursor:pointer;transition:background .2s ease;font-weight:600}
+button#downloadBtn:hover{background:#1d4ed8}
+button#downloadBtn i{font-size:1.1rem;margin-right:0.35rem}
+
+#status{margin-top:1rem;font-size:0.9rem;color:#334155;min-height:1.3rem}
+
+#preview{margin-top:1.5rem}
+img,video{max-width:100%;border-radius:0.75rem;box-shadow:0 6px 14px rgba(0,0,0,.15)}
+
+a.download{display:inline-block;margin-top:0.85rem;padding:0.6rem 1.2rem;background:#0d9488;color:#fff;text-decoration:none;border-radius:0.55rem;font-size:0.95rem;font-weight:500;transition:background .2s}
+a.download:hover{background:#0f766e}
+
+/* ---- PLATFORM ICONS LIST ---- */
+.icons{display:flex;flex-wrap:wrap;justify-content:center;gap:0.8rem;margin:1.5rem 0 2rem}
+.icons i{font-size:1.65rem;color:#475569}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎞️ Video Downloader</h1>
+    <p class="tagline">TikTok • YouTube • Facebook Reels • Instagram Reels • Terabox • Dishwala • Dailymotion</p><!-- Supported platform icons -->
+<div class="icons">
+  <i class="fa-brands fa-tiktok" title="TikTok"></i>
+  <i class="fa-brands fa-youtube" title="YouTube"></i>
+  <i class="fa-brands fa-facebook" title="Facebook"></i>
+  <i class="fa-brands fa-instagram" title="Instagram"></i>
+  <i class="fa-solid fa-cloud-arrow-down" title="Terabox"></i>
+  <i class="fa-solid fa-satellite-dish" title="Dishwala"></i>
+  <i class="fa-brands fa-dailymotion" title="Dailymotion"></i>
+</div>
+
+<input type="text" id="urlInput" placeholder="Paste any video URL here…" autocomplete="off" />
+<button id="downloadBtn"><i class="fa-solid fa-circle-arrow-down"></i>Download</button>
+
+<div id="status"></div>
+<div id="preview"></div>
+
+  </div>
+  <script>
+    const urlInput  = document.getElementById('urlInput');
+    const dlBtn     = document.getElementById('downloadBtn');
+    const statusBox = document.getElementById('status');
+    const preview   = document.getElementById('preview');
+
+    const directExt = /(\.jpg|\.jpeg|\.png|\.gif|\.webp|\.bmp|\.svg|\.mp4|\.webm|\.mov|\.mkv)$/i;
+
+    function clearPreview(){preview.innerHTML='';}
+    function setStatus(txt){statusBox.textContent = txt;}
+
+    // Identify which site for internal logging (optional)
+    function platform(url){
+      if(/tiktok\.com/i.test(url)) return 'tiktok';
+      if(/youtu\.?be/.test(url)) return 'youtube';
+      if(/facebook\.com/.test(url)) return 'facebook';
+      if(/instagram\.com/.test(url)) return 'instagram';
+      if(/terabox\.com|4funbox/.test(url)) return 'terabox';
+      if(/dishwala/i.test(url)) return 'dishwala';
+      if(/dailymotion\.com/.test(url)) return 'dailymotion';
+      return 'generic';
+    }
+
+    dlBtn.addEventListener('click', async ()=>{
+      const url = urlInput.value.trim();
+      if(!url){alert('Please enter a URL!');return;}
+
+      clearPreview();
+      setStatus(`Fetching download link for ${platform(url)} …`);
+
+      // 1️⃣ Direct media link → preview instantly
+      if(directExt.test(url)){
+        setStatus('Direct file detected!');
+        showPreview(url);
+        return;
+      }
+
+      // 2️⃣ Otherwise call backend
+      try{
+        const res = await fetch(`/api/grab?url=${encodeURIComponent(url)}`);
+        if(!res.ok) throw new Error('Server error');
+        const data = await res.json();
+        if(!data || !data.download){throw new Error('No download found');}
+        showPreview(data.download);
+        setStatus('Ready!');
+      }catch(err){
+        console.error(err);
+        setStatus('Sorry, could not fetch a download link.');
+      }
+    });
+
+    // Render preview + save link
+    function showPreview(mediaUrl){
+      let tag;
+      if(/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(mediaUrl)){
+        tag = document.createElement('img');
+        tag.src = mediaUrl;
+        tag.alt = 'Preview Image';
+      }else{
+        tag = document.createElement('video');
+        tag.src = mediaUrl;
+        tag.controls = true;
+      }
+      preview.appendChild(tag);
+
+      const dl = document.createElement('a');
+      dl.href = mediaUrl;
+      dl.download = '';
+      dl.textContent = 'Save to gallery';
+      dl.className = 'download';
+      preview.appendChild(dl);
+    }
+  </script></body>
+</html>
